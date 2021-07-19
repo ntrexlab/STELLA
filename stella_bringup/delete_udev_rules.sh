@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "delete remap the devices serial port(ttyUSBX) to  rplidar, AHRS, Motordriver"
+echo "delete remap the devices serial port(ttyUSBX,ttySX) to  ydlidar, AHRS, Motordriver, Bluetooth"
 echo "sudo rm   /etc/udev/rules.d/stella.rules"
 sudo rm   /etc/udev/rules.d/stella.rules
 echo " "
