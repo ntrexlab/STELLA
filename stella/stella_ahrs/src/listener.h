@@ -11,7 +11,8 @@
 #include <stdlib.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <math.h>
-#include <mutex>
+#include <pthread.h>
+#include "MwSerial.hpp"
 
 
 #define DEG2RAD( a ) ( (a) * (M_PI/180.0f) )
@@ -30,14 +31,10 @@
 
 using namespace std;
 
-unsigned char buff;
-unsigned char buff_arrey[13] = {0,};
-int serial_port;
-
-int rx_count = 0;
-bool rx_flag = false;
-
-char cs = 0;
+char data[8];
+long id = 0;
+int length = 0;
+bool run = true;
 
 int16_t acc_x = 0, acc_y = 0, acc_z = 0, gyo_x = 0, gyo_y = 0, gyo_z = 0, deg_x = 0, deg_y = 0, deg_z = 0; 
 
