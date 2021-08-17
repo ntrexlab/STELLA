@@ -40,7 +40,7 @@ sensor_msgs::Imu imu;
 
 ros::Time current_time, last_time;
 
-int left_rpm = 0, rigth_rpm = 0;
+float left_rpm = 0, rigth_rpm = 0;
 int left_encoder = 0, right_encoder = 0,delta_left = 0,delta_right = 0,left_encoder_prev=0,right_encoder_prev=0;
 
 float linear_x = 0.0, angular_ = 0.0;

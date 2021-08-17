@@ -22,7 +22,7 @@ void ntrex_can_fifo::MD_input(char *str)
 {
     if (!strcmp(str, "move"))
     {
-        sprintf(write_buf, "mvc=%d,%d\n", left_rpm, rigth_rpm); //
+        sprintf(write_buf, "mvc=%0.3f,%0.3f\r\n", left_rpm, rigth_rpm); //
 
         for (int i = 0; i < strlen(write_buf); i++)
         {
@@ -33,7 +33,7 @@ void ntrex_can_fifo::MD_input(char *str)
 
     if (!strcmp(str, "encoder"))
     {
-        sprintf(write_buf, "mp\n");
+        sprintf(write_buf, "mp\r\n");
 
         for (int i = 0; i < strlen(write_buf); i++)
         {
@@ -51,16 +51,18 @@ void ntrex_can_fifo::chatterCallback(const geometry_msgs::Twist::ConstPtr &msg)
     angular_ = msg->angular.z;
 
     MD_input("move");
+    //MD_input("encoder");
 }
 
 void ntrex_can_fifo::writepub()
 {
-    ros::Rate rate(20);
+    ros::Rate rate(5);
 
     while (1)
     {
+/*
         geometry_msgs::Quaternion Quaternion = tf::createQuaternionMsgFromYaw(th);
-   
+
         transform.setOrigin( tf::Vector3(x, y,0));
         transform.setRotation(tf::Quaternion(Quaternion.x,Quaternion.y,Quaternion.z,Quaternion.w));
 
@@ -80,18 +82,20 @@ void ntrex_can_fifo::writepub()
         odom.twist.twist.linear.x = linear_x;
         odom.twist.twist.linear.y = 0;
         odom.twist.twist.angular.z = angular_;
-        
-        chatter_pub.publish(odom);
 
+        chatter_pub.publish(odom);
+*/
         rate.sleep();
     }
 }
 
 void ntrex_can_fifo::readStatus()
 {
+    ros::Rate rate(20);
+
     while (1)
     {
-        ros::Rate rate(5);
+        MD_input("encoder");
 
         current_time = ros::Time::now();
 
@@ -121,24 +125,48 @@ void ntrex_can_fifo::readStatus()
             left_encoder = atoi(parsing[0]);
             right_encoder = atoi(parsing[1]);
 
-            delta_left = left_encoder - left_encoder_prev;
+//            printf("%d %d %d\n", left_encoder, right_encoder, atoi(parsing[2]));
+
+            delta_left = (left_encoder - left_encoder_prev) * -1;
             delta_right = right_encoder - right_encoder_prev;
 
             if (abs(delta_left) < 12000 && abs(delta_right) < 12000)
             {
                 delta_s = (delta_left + delta_right) / 2.0 / pulse_per_distance;
                 delta_th = ((delta_right - delta_left) / wheel_to_wheel_d / pulse_per_distance);
-                delta_x = (delta_s * cos(th + delta_th / 2.0)) * dt;
-                delta_y = (delta_s * sin(th + delta_th / 2.0)) * dt;
+                delta_x = (delta_s * cos(th + delta_th / 2.0));
+                delta_y = (delta_s * sin(th + delta_th / 2.0));
 
                 //ROS_INFO("%d  %d  \n",delta_left,delta_right);
             }
 
-            x += delta_x;
-            y += delta_y;
+            x -= delta_x;
+            y -= delta_y;
             th += delta_th;
         }
+        geometry_msgs::Quaternion Quaternion = tf::createQuaternionMsgFromYaw(th);
+   
+        transform.setOrigin( tf::Vector3(x, y,0));
+        transform.setRotation(tf::Quaternion(Quaternion.x,Quaternion.y,Quaternion.z,Quaternion.w));
 
+        odom_broadcaster.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "odom", "base_footprint"));
+
+        nav_msgs::Odometry odom;
+
+        odom.header.stamp = current_time;
+        odom.header.frame_id = "odom";
+
+        odom.pose.pose.position.x = x;
+        odom.pose.pose.position.y = y;
+        odom.pose.pose.position.z = 0.0;
+        odom.pose.pose.orientation = Quaternion;
+
+        odom.child_frame_id = "base_footprint";
+        odom.twist.twist.linear.x = linear_x;
+        odom.twist.twist.linear.y = 0;
+        odom.twist.twist.angular.z = angular_;
+
+        chatter_pub.publish(odom);
         left_encoder_prev = left_encoder;
         right_encoder_prev = right_encoder;
 
@@ -208,3 +236,4 @@ int main(int argc, char **argv)
 
     return 0;
 }
+

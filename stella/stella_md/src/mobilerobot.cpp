@@ -1,6 +1,6 @@
 #include "mobilerobot.h"
 
-void calculate_wheel_vel(float linear, float angular, int *left_rpm,  int *right_rpm)
+void calculate_wheel_vel(float linear, float angular, float *left_rpm,  float *right_rpm)
 {
     float left_speed = 0.0, right_speed = 0.0;
 
