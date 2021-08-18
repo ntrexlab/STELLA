@@ -7,7 +7,6 @@ ntrex_can_fifo::ntrex_can_fifo()
     sub = n.subscribe("cmd_vel", 10, &ntrex_can_fifo::chatterCallback, this);
 
     thread_read_AHRS = new std::thread(&ntrex_can_fifo::readStatus, this);
-    thread_pub_odm = new std::thread(&ntrex_can_fifo::writepub, this);
 }
 
 ntrex_can_fifo::~ntrex_can_fifo()
@@ -51,42 +50,6 @@ void ntrex_can_fifo::chatterCallback(const geometry_msgs::Twist::ConstPtr &msg)
     angular_ = msg->angular.z;
 
     MD_input("move");
-    //MD_input("encoder");
-}
-
-void ntrex_can_fifo::writepub()
-{
-    ros::Rate rate(5);
-
-    while (1)
-    {
-/*
-        geometry_msgs::Quaternion Quaternion = tf::createQuaternionMsgFromYaw(th);
-
-        transform.setOrigin( tf::Vector3(x, y,0));
-        transform.setRotation(tf::Quaternion(Quaternion.x,Quaternion.y,Quaternion.z,Quaternion.w));
-
-        odom_broadcaster.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "odom", "base_footprint"));
-
-        nav_msgs::Odometry odom;
-
-        odom.header.stamp = current_time;
-        odom.header.frame_id = "odom";
-
-        odom.pose.pose.position.x = x;
-        odom.pose.pose.position.y = y;
-        odom.pose.pose.position.z = 0.0;
-        odom.pose.pose.orientation = Quaternion;
-
-        odom.child_frame_id = "base_footprint";
-        odom.twist.twist.linear.x = linear_x;
-        odom.twist.twist.linear.y = 0;
-        odom.twist.twist.angular.z = angular_;
-
-        chatter_pub.publish(odom);
-*/
-        rate.sleep();
-    }
 }
 
 void ntrex_can_fifo::readStatus()
@@ -125,8 +88,6 @@ void ntrex_can_fifo::readStatus()
             left_encoder = atoi(parsing[0]);
             right_encoder = atoi(parsing[1]);
 
-//            printf("%d %d %d\n", left_encoder, right_encoder, atoi(parsing[2]));
-
             delta_left = (left_encoder - left_encoder_prev) * -1;
             delta_right = right_encoder - right_encoder_prev;
 
@@ -136,8 +97,6 @@ void ntrex_can_fifo::readStatus()
                 delta_th = ((delta_right - delta_left) / wheel_to_wheel_d / pulse_per_distance);
                 delta_x = (delta_s * cos(th + delta_th / 2.0));
                 delta_y = (delta_s * sin(th + delta_th / 2.0));
-
-                //ROS_INFO("%d  %d  \n",delta_left,delta_right);
             }
 
             x -= delta_x;
