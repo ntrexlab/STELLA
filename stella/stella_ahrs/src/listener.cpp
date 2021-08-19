@@ -29,7 +29,6 @@ void *AHRS_thread(void *arg)
                 break;
 
             case DEG:
-                printf("c8");
 		deg_x = ((int)(unsigned char)data[2] | (int)(unsigned char)data[3] << 8);
                 deg_y = ((int)(unsigned char)data[4] | (int)(unsigned char)data[5] << 8);
                 deg_z = ((int)(unsigned char)data[6] | (int)(unsigned char)data[7] << 8);
