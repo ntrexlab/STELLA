@@ -1,9 +1,9 @@
-#define wheel_to_wheel_d            0.337       // ë°”í€´ì? ë°”í€?ê°?ê±°ë¦¬  [m]
-#define distance_per_rev            0.5652        // ?œë°”???Œì „???´ë™ ê±°ë¦¬ [m / rev]
-#define pulse_per_rev               54000        // ?œë°”???Œì „???”ì½”???„ìŠ¤ ì¹´ìš´????ê°’ì? ë¶€ì°©ëœ ?”ì½”?”ì? ê°ì†ê¸°ë? ê³ ë ¤???•í•´ì§„ë‹¤.) [pulse / rev] 
-#define pulse_per_distance          95541.4012739    // 1m ?´ë™???”ì½”???„ìŠ¤ ì¹´ìš´??[pulse / m]
-#define gear_ratio                  27           // ê°ì†ë¹?
-#define motor_scale_const           106.1032954
+#define wheel_to_wheel_d            0.337       // 바퀴와 바퀴 간 거리  [m]
+#define distance_per_rev            0.5652        // 한바퀴 회전시 이동 거리 [m / rev]
+#define pulse_per_rev               54000        // 한바퀴 회전시 엔코더 펄스 카운트(이 값은 부착된 엔코더와 감속기를 고려해 정해진다.) [pulse / rev]
+#define pulse_per_distance          95541.4012739    // 1m 이동시 엔코더 펄스 카운트 [pulse / m]
+#define gear_ratio                  27           // 감속비
+#define motor_scale_const           106.1032954  // m/s to rpm
 
 
 
